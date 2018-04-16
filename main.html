@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>math.js | plot</title>
+  <script src="./math.min.js"></script>
+
+  <script src="./plotly-1.35.2.min.js"></script>
+
+  <style>
+    body, html, input {
+      font-family: sans-serif;
+      font-size: 11pt;
+
+    }
+    form {
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+
+<div id="plot"></div>
+
+<script>
+  (function(exports, d) {
+    function domReady(fn, context) {
+
+      function onReady(event) {
+        d.removeEventListener("DOMContentLoaded", onReady);
+        fn.call(context || exports, event);
+      }
+
+      function onReadyIe(event) {
+        if (d.readyState === "complete") {
+          d.detachEvent("onreadystatechange", onReadyIe);
+          fn.call(context || exports, event);
+        }
+      }
+
+      d.addEventListener && d.addEventListener("DOMContentLoaded", onReady) ||
+      d.attachEvent      && d.attachEvent("onreadystatechange", onReadyIe);
+    }
+
+    exports.domReady = domReady;
+  })(window, document);
+
+  var layout = {
+    xaxis: {
+      title: 'PJ_X',
+      autorange: true,
+      showgrid: true,
+      zeroline: false,
+      showline: true,
+      autotick: true,
+      ticks: '',
+      showticklabels: true 
+    },
+    yaxis: {
+      title: 'PJ_Y',
+      autorange: true,
+      showgrid: true,
+      zeroline: false,
+      showline: true,
+      autotick: true,
+      ticks: '',
+      showticklabels: true 
+    }
+  };
+
+  function drawAxes() {
+    var data = [];
+    Plotly.newPlot('plot', data, layout);
+  }
+
+  function drawProjectedPointList(projectedPointXMarkerList, projectedPointYMarkerList, projectedPointZMarkerList) {
+    var twoDimensionalPointXMarkerXList = [];
+    var twoDimensionalPointXMarkerYList = [];
+    var textXMarkerList = [];
+    
+    for (var k = 0; k < projectedPointXMarkerList.length; ++k) {
+      twoDimensionalPointXMarkerXList.push(projectedPointXMarkerList[k][0]); 
+      twoDimensionalPointXMarkerYList.push(projectedPointXMarkerList[k][1]); 
+      textXMarkerList.push("(" + parseFloat(projectedPointXMarkerList[k][0]).toFixed(2) + "," + parseFloat(projectedPointXMarkerList[k][1]).toFixed(2) + ")");
+    }
+
+    var twoDimensionalPointYMarkerXList = [];
+    var twoDimensionalPointYMarkerYList = [];
+    var textYMarkerList = [];
+    
+    for (var k = 0; k < projectedPointYMarkerList.length; ++k) {
+      twoDimensionalPointYMarkerXList.push(projectedPointYMarkerList[k][0]); 
+      twoDimensionalPointYMarkerYList.push(projectedPointYMarkerList[k][1]); 
+      textYMarkerList.push("(" + parseFloat(projectedPointYMarkerList[k][0]).toFixed(2) + "," + parseFloat(projectedPointYMarkerList[k][1]).toFixed(2) + ")");
+    }
+
+    var twoDimensionalPointZMarkerXList = [];
+    var twoDimensionalPointZMarkerYList = [];
+    var textZMarkerList = [];
+    
+    for (var k = 0; k < projectedPointZMarkerList.length; ++k) {
+      twoDimensionalPointZMarkerXList.push(projectedPointZMarkerList[k][0]); 
+      twoDimensionalPointZMarkerYList.push(projectedPointZMarkerList[k][1]); 
+      textZMarkerList.push("(" + parseFloat(projectedPointZMarkerList[k][0]).toFixed(2) + "," + parseFloat(projectedPointZMarkerList[k][1]).toFixed(2) + ")");
+    }
+
+    var data = [{
+      x: twoDimensionalPointXMarkerXList,
+      y: twoDimensionalPointXMarkerYList,
+      mode: 'lines+markers+text',
+      text: textXMarkerList,
+      name: 'WorldCoordinate_X',
+      textposition: 'bottom',
+      type: 'scatter'
+    }, {
+      x: twoDimensionalPointYMarkerXList,
+      y: twoDimensionalPointYMarkerYList,
+      mode: 'lines+markers+text',
+      text: textYMarkerList,
+      name: 'WorldCoordinate_Y',
+      textposition: 'bottom',
+      type: 'scatter'
+    }, {
+      x: twoDimensionalPointZMarkerXList,
+      y: twoDimensionalPointZMarkerYList,
+      mode: 'lines+markers+text',
+      text: textZMarkerList,
+      name: 'WorldCoordinate_Z',
+      textposition: 'bottom',
+      type: 'scatter'
+    }];
+
+    Plotly.react('plot', data, layout);
+  }
+
+  var constFactor = 1/math.sqrt(6);
+  var projMat1 = [[math.sqrt(3), 0, -math.sqrt(3)], [1, 2, 1], [math.sqrt(2), -math.sqrt(2), math.sqrt(2)]]; 
+  var projMat2 = [[constFactor, 0, 0], [0, constFactor, 0], [0, 0, 0]]; 
+
+  var p1 = [4, 0, 0];
+  var p2 = [5, 0, 0];
+  var p3 = [0, 4, 0];
+  var p4 = [0, 5, 0];
+  var p5 = [0, 0, 4];
+  var p6 = [0, 0, 5];
+
+  var criticalXPoints = [p1, p2];
+  var criticalYPoints = [p3, p4];
+  var criticalZPoints = [p5, p6];
+
+  domReady(function(evt) {
+    drawAxes();
+    var projectedXPointList = [];
+    for (var k in criticalXPoints) {
+      projectedXPointList.push(math.multiply(projMat2, math.multiply(projMat1, criticalXPoints[k]))); 
+    }
+    console.log(projectedXPointList);
+
+    var projectedYPointList = [];
+    for (var k in criticalYPoints) {
+      projectedYPointList.push(math.multiply(projMat2, math.multiply(projMat1, criticalYPoints[k]))); 
+    }
+    console.log(projectedYPointList);
+
+    var projectedZPointList = [];
+    for (var k in criticalZPoints) {
+      projectedZPointList.push(math.multiply(projMat2, math.multiply(projMat1, criticalZPoints[k]))); 
+    }
+    console.log(projectedZPointList);
+
+    drawProjectedPointList(projectedXPointList, projectedYPointList, projectedZPointList);
+  });
+</script>
+
+</body>
+</html>
