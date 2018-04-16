@@ -7,13 +7,10 @@
   <script src="./plotly-1.35.2.min.js"></script>
 
   <style>
-    body, html, input {
+    body, html {
       font-family: sans-serif;
       font-size: 11pt;
 
-    }
-    form {
-      margin: 20px 0;
     }
   </style>
 </head>
@@ -116,7 +113,15 @@
       text: textXMarkerList,
       name: 'WorldCoordinate_X',
       textposition: 'bottom',
-      type: 'scatter'
+      type: 'scatter',
+      marker: {
+        size: 10,
+        color: 'red',
+        line: {
+          color: 'red', 
+          width: 2, 
+        }
+      },
     });
     data.push({
       x: twoDimensionalPointYMarkerXList,
@@ -125,7 +130,15 @@
       text: textYMarkerList,
       name: 'WorldCoordinate_Y',
       textposition: 'bottom',
-      type: 'scatter'
+      type: 'scatter',
+      marker: {
+        size: 10,
+        color: 'green',
+        line: {
+          color: 'green', 
+          width: 2, 
+        }
+      },
     });
     data.push({
       x: twoDimensionalPointZMarkerXList,
@@ -134,14 +147,22 @@
       text: textZMarkerList,
       name: 'WorldCoordinate_Z',
       textposition: 'bottom',
-      type: 'scatter'
+      type: 'scatter',
+      marker: {
+        size: 10,
+        color: 'blue',
+        line: {
+          color: 'blue', 
+          width: 2, 
+        }
+      },
     });
 
     Plotly.react('plot', data, layout);
     return data;
   }
 
-  function drawProjectedPointListAlone(existingData, projectedPointList, criticalPoints) {
+  function drawProjectedFilledShape(existingData, projectedPointList, criticalPoints, legendName) {
     var twoDimensionalPointMarkerXList = [];
     var twoDimensionalPointMarkerYList = [];
     var textMarkerList = [];
@@ -158,12 +179,13 @@
       y: twoDimensionalPointMarkerYList,
       mode: 'lines+markers+text',
       text: textMarkerList,
-      name: 'SampleCube',
+      name: legendName,
       textposition: 'bottom',
       marker: {
         size: 10,
-        color: 'red'
+        color: 'grey'
       },
+      fill: 'tonexty',
       type: 'scatter'
     });
 
@@ -181,40 +203,21 @@
 
   domReady(function(evt) {
     drawAxes();
-    var projectedXPointList = [];
-    for (var k in criticalXPoints) {
-      projectedXPointList.push(math.multiply(projMat2, math.multiply(projMat1, criticalXPoints[k]))); 
-    }
-    console.log(projectedXPointList);
-
-    var projectedYPointList = [];
-    for (var k in criticalYPoints) {
-      projectedYPointList.push(math.multiply(projMat2, math.multiply(projMat1, criticalYPoints[k]))); 
-    }
-    console.log(projectedYPointList);
-
-    var projectedZPointList = [];
-    for (var k in criticalZPoints) {
-      projectedZPointList.push(math.multiply(projMat2, math.multiply(projMat1, criticalZPoints[k]))); 
-    }
-    console.log(projectedZPointList);
-
     var data = [];
-    data = drawProjectedPointList(data, projectedXPointList, projectedYPointList, projectedZPointList, criticalXPoints, criticalYPoints, criticalZPoints);
 
     var criticalCubeF1PointList = [
-      [1, 1, 1],
-      [1, 1, 0],
       [0, 1, 0],
+      [1, 1, 0],
+      [1, 1, 1],
       [0, 1, 1],
-      [1, 1, 1]
+      [0, 1, 0],
     ];
 
     var projectedCubeF1PointList = [];
     for (var k in criticalCubeF1PointList) {
       projectedCubeF1PointList.push(math.multiply(projMat2, math.multiply(projMat1, criticalCubeF1PointList[k]))); 
     }
-    data = drawProjectedPointListAlone(data, projectedCubeF1PointList, criticalCubeF1PointList);
+    data = drawProjectedFilledShape(data, projectedCubeF1PointList, criticalCubeF1PointList, 'F1');
 
     var criticalCubeF2PointList = [
       [0, 0, 0],
@@ -228,7 +231,7 @@
     for (var k in criticalCubeF2PointList) {
       projectedCubeF2PointList.push(math.multiply(projMat2, math.multiply(projMat1, criticalCubeF2PointList[k]))); 
     }
-    data = drawProjectedPointListAlone(data, projectedCubeF2PointList, criticalCubeF2PointList);
+    data = drawProjectedFilledShape(data, projectedCubeF2PointList, criticalCubeF2PointList, 'F2');
 
     var criticalCubeF3PointList = [
       [0, 0, 0],
@@ -242,7 +245,24 @@
     for (var k in criticalCubeF3PointList) {
       projectedCubeF3PointList.push(math.multiply(projMat2, math.multiply(projMat1, criticalCubeF3PointList[k]))); 
     }
-    data = drawProjectedPointListAlone(data, projectedCubeF3PointList, criticalCubeF3PointList);
+    data = drawProjectedFilledShape(data, projectedCubeF3PointList, criticalCubeF3PointList, 'F3');
+
+    var projectedXPointList = [];
+    for (var k in criticalXPoints) {
+      projectedXPointList.push(math.multiply(projMat2, math.multiply(projMat1, criticalXPoints[k]))); 
+    }
+
+    var projectedYPointList = [];
+    for (var k in criticalYPoints) {
+      projectedYPointList.push(math.multiply(projMat2, math.multiply(projMat1, criticalYPoints[k]))); 
+    }
+
+    var projectedZPointList = [];
+    for (var k in criticalZPoints) {
+      projectedZPointList.push(math.multiply(projMat2, math.multiply(projMat1, criticalZPoints[k]))); 
+    }
+    data = drawProjectedPointList(data, projectedXPointList, projectedYPointList, projectedZPointList, criticalXPoints, criticalYPoints, criticalZPoints);
+
   });
 </script>
 
