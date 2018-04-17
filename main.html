@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <title>math.js | plot</title>
   <script src="./math.min.js"></script>
 
@@ -285,6 +286,7 @@
 
     data = drawProjectedPointList(data, projectedXPointList, projectedYPointList, projectedZPointList, criticalXPoints, criticalYPoints, criticalZPoints);
 
+    console.log("The angle between `PJ_Y` and `projected-X-axis` in degrees is " + parseFloat(180*math.atan(projectedXPointList[2][1]/projectedXPointList[2][0])/math.pi).toFixed(2));
   });
 </script>
 
